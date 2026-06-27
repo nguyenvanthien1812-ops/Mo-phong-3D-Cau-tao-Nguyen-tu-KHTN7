@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mô phỏng 3D Cấu tạo Nguyên tử - Bài 2 KHTN 7</title>
+    <!-- Google Fonts for Vietnamese support -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Three.js and OrbitControls via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div id="app-container">
+        <!-- 3D Canvas Area (75% width on desktop) -->
+        <main id="simulation-viewport">
+            <!-- Immersive Floating Header -->
+            <header class="main-header">
+                <span class="brand-badge">KHTN 7 - Bài 2</span>
+                <h1>Cấu tạo Nguyên tử</h1>
+                <p class="subtitle">Mô hình Carbon (<sub>6</sub>C) chuẩn Rutherford - Bohr</p>
+            </header>
+
+            <!-- Floating 3D Legend Card (Top-Left) -->
+            <div class="canvas-legend">
+                <div class="legend-item">
+                    <span class="dot red-dot"></span>
+                    <span>Proton (+)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="dot grey-dot"></span>
+                    <span>Neutron (0)</span>
+                </div>
+                <div class="legend-item">
+                    <span class="dot blue-dot"></span>
+                    <span>Electron (-)</span>
+                </div>
+            </div>
+
+            <div id="canvas3d"></div>
+            
+            <!-- 2D Annotations overlay layer (tracked in JS) -->
+            <div id="labels-overlay"></div>
+            
+            <!-- Floating Teacher Guide Panel (Bottom Overlay) -->
+            <div id="teacher-guide" class="collapsed">
+                <div class="guide-header" id="toggle-guide-header">
+                    <span class="guide-title">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        Lời dẫn và Gợi ý Sư phạm (Giáo viên)
+                    </span>
+                    <button class="btn-toggle-guide" id="btn-toggle-guide" title="Ẩn/Hiện lời dẫn">
+                        <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="18 15 12 9 6 15"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <div class="guide-content">
+                    <div class="guide-steps-carousel">
+                        <div class="guide-step active" data-step="1">
+                            <span class="step-badge">Giai đoạn 1: Quan sát tổng thể</span>
+                            <p class="step-text">"Các em hãy quan sát mô hình 3D trên bảng, theo các em, hạt nhân đang nằm ở vị trí nào của nguyên tử? Lớp vỏ có cấu tạo như thế nào?"</p>
+                        </div>
+                        <div class="guide-step" data-step="2">
+                            <span class="step-badge">Giai đoạn 2: Quan sát chuyển động</span>
+                            <p class="step-text">"Khi thầy/cô tăng tốc độ lên, các em thấy các electron đang di chuyển như thế nào xung quanh hạt nhân? Chúng di chuyển tự do hay có quỹ đạo xác định?"</p>
+                        </div>
+                        <div class="guide-step" data-step="3">
+                            <span class="step-badge">Giai đoạn 3: Khám phá hạt nhân (Bóc tách)</span>
+                            <p class="step-text">"Bây giờ, thầy/cô sẽ bóc tách lớp vỏ electron ra. Các em hãy quan sát kỹ bên trong lõi hạt nhân có mấy loại hạt, và chúng có màu sắc như thế nào?"</p>
+                        </div>
+                        <div class="guide-step" data-step="4">
+                            <span class="step-badge">Giai đoạn 4: Chốt kiến thức tổng hợp</span>
+                            <p class="step-text">"Từ những quan sát trực quan vừa rồi, bạn nào có thể chốt lại cho lớp biết cấu tạo nguyên tử gồm những phần nào và các loại hạt tương ứng?"</p>
+                        </div>
+                    </div>
+                    <div class="guide-navigation">
+                        <button id="prev-guide" class="btn-icon-small" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <span id="guide-indicator">1 / 4</span>
+                        <button id="next-guide" class="btn-icon-small">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Floating Controls Card on the right -->
+        <aside id="controls-sidebar">
+            <div class="control-groups-container">
+                <!-- Group 1: Mô phỏng & Tương tác (Combined Bóc tách & Chuyển động) -->
+                <section class="control-group">
+                    <h2 class="group-title">Điều khiển mô phỏng</h2>
+                    <button id="btn-explode" class="btn btn-primary btn-large">
+                        <svg class="icon btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                            <line x1="12" y1="22.08" x2="12" y2="12" />
+                        </svg>
+                        <span id="explode-text">Bóc tách nguyên tử</span>
+                    </button>
+                    
+                    <div class="play-controls-row">
+                        <button id="btn-play-pause" class="btn btn-secondary">
+                            <svg class="icon play-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            <svg class="icon pause-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="6" y="4" width="4" height="16"></rect>
+                                <rect x="14" y="4" width="4" height="16"></rect>
+                            </svg>
+                            <span id="play-pause-text">Tạm dừng</span>
+                        </button>
+                        
+                        <button id="btn-auto-rotate" class="btn btn-secondary" title="Tự động xoay camera">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                            </svg>
+                            <span>Xoay camera</span>
+                        </button>
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Tốc độ electron:</span>
+                            <span id="speed-value">1.0x</span>
+                        </div>
+                        <input type="range" id="slider-speed" min="0" max="3" step="0.1" value="1.0">
+                    </div>
+                </section>
+
+                <!-- Group 2: Hiển thị trực quan -->
+                <section class="control-group">
+                    <h2 class="group-title">Hiển thị trực quan</h2>
+                    <div class="toggle-grid">
+                        <button id="btn-toggle-orbits" class="btn btn-toggle active">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M8 12a4 4 0 1 1 8 0 4 4 0 0 1-8 0z" />
+                            </svg>
+                            <span>Hiện quỹ đạo</span>
+                        </button>
+                        
+                        <button id="btn-toggle-labels" class="btn btn-toggle active">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span>Hiện chú thích</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Group 3: Thành phần cấu tạo -->
+                <section class="control-group stats-panel">
+                    <h2 class="group-title">Thành phần cấu tạo</h2>
+                    <div class="stats-list">
+                        <!-- Proton -->
+                        <div class="stat-list-item">
+                            <div class="stat-type">
+                                <span class="dot red-dot"></span>
+                                <span class="stat-name">Proton (p)</span>
+                            </div>
+                            <span class="stat-count">6 <small>hạt</small></span>
+                            <span class="stat-desc text-red">(+)</span>
+                        </div>
+
+                        <!-- Neutron -->
+                        <div class="stat-list-item">
+                            <div class="stat-type">
+                                <span class="dot grey-dot"></span>
+                                <span class="stat-name">Neutron (n)</span>
+                            </div>
+                            <span class="stat-count">6 <small>hạt</small></span>
+                            <span class="stat-desc text-muted">(0)</span>
+                        </div>
+
+                        <!-- Electron -->
+                        <div class="stat-list-item">
+                            <div class="stat-type">
+                                <span class="dot blue-dot"></span>
+                                <span class="stat-name">Electron (e)</span>
+                            </div>
+                            <span class="stat-count">6 <small>hạt</small></span>
+                            <span class="stat-desc text-blue">(-)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-summary">
+                        <div class="summary-row">
+                            <span>Điện tích hạt nhân:</span>
+                            <span class="charge-value text-red">+6</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Điện tích lớp vỏ:</span>
+                            <span class="charge-value text-blue">-6</span>
+                        </div>
+                        <hr class="summary-divider">
+                        <div class="summary-row highlight">
+                            <span>Trạng thái điện tích:</span>
+                            <span class="charge-status text-green">Trung hòa về điện</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Sidebar Footer: Reset & Guide Toggle -->
+            <footer class="sidebar-footer">
+                <button id="btn-toggle-guide-panel" class="btn btn-secondary active">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <span id="toggle-guide-btn-text">Ẩn lời dẫn</span>
+                </button>
+                <button id="btn-reset" class="btn btn-danger">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <polyline points="3 3 3 8 8 8" />
+                    </svg>
+                    <span>Làm lại</span>
+                </button>
+            </footer>
+        </aside>
+    </div>
+
+    <!-- Main JavaScript App -->
+    <script src="app.js"></script>
+</body>
+</html>

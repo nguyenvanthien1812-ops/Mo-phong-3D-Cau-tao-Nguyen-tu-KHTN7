@@ -1,0 +1,762 @@
+/* Style rules for 3D Atomic Structure Simulation */
+:root {
+    --bg-dark: #0a0e17;
+    --bg-sidebar: rgba(13, 20, 35, 0.75);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-focus: rgba(0, 168, 255, 0.4);
+    
+    --color-text: #e2e8f0;
+    --color-text-muted: #94a3b8;
+    
+    --color-proton: #ff4757;
+    --color-neutron: #a4b0be;
+    --color-electron: #00d2d3;
+    --color-orbit: #f1c40f;
+    
+    --color-success: #2ed573;
+    --color-primary: #1e90ff;
+    --color-primary-hover: #3742fa;
+    --color-danger: #ff6b81;
+    
+    --font-main: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+    --transition-speed: 0.3s;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden !important; /* Triệt tiêu hoàn toàn thanh cuộn trình duyệt */
+    background-color: var(--bg-dark);
+    color: var(--color-text);
+    font-family: var(--font-main);
+}
+
+#app-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(circle at 35% center, #111a2e 0%, #05080f 100%);
+}
+
+/* 3D Simulation Viewport */
+#simulation-viewport {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% - 400px); /* Dành không gian bên phải cho sidebar */
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+    z-index: 1;
+}
+
+#canvas3d {
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+/* Labels Overlay Layer */
+#labels-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Let clicks pass through to OrbitControls */
+    overflow: hidden;
+    z-index: 10;
+}
+
+/* Annotation Badges */
+/*.badge-label */
+.badge-label {
+    position: absolute;
+    transform: translate(-50%, calc(-100% - 20px));
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 1.05rem; /* Tăng kích thước nhãn 3D cho rõ ràng */
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    pointer-events: auto; /* Allow hovering or clicking if needed */
+    transition: opacity 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    opacity: 0; /* Updated in JS when ready */
+}
+
+.badge-label::after {
+    content: '';
+    position: absolute;
+    width: 1px;
+    height: 20px;
+    background-color: currentColor;
+    top: 100%;
+    left: 50%;
+    opacity: 0.6;
+}
+
+.badge-nucleus {
+    background-color: rgba(10, 15, 26, 0.95);
+    border: 1px solid var(--color-proton);
+    color: #ffffff; /* Đổi sang màu trắng để tăng tương phản, dễ đọc */
+}
+
+.badge-shell {
+    background-color: rgba(10, 15, 26, 0.95);
+    border: 1px solid var(--color-electron);
+    color: #ffffff;
+}
+
+.badge-orbit-1 {
+    background-color: rgba(10, 15, 26, 0.95);
+    border: 1px solid var(--color-orbit);
+    color: #ffffff;
+}
+
+.badge-orbit-2 {
+    background-color: rgba(10, 15, 26, 0.95);
+    border: 1px solid var(--color-orbit);
+    color: #ffffff;
+}
+
+/* Floating Canvas Legend (Top-Left) */
+.canvas-legend {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    background: rgba(10, 15, 26, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 15;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+/* Teacher Guide Panel (Bottom Slide-up) */
+#teacher-guide {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 800px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+#teacher-guide.collapsed {
+    transform: translate(-50%, calc(100% - 50px));
+}
+
+.guide-header {
+    height: 50px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(30, 41, 59, 0.4);
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+}
+
+.guide-title {
+    font-size: 1.1rem; /* Tăng kích thước tiêu đề hướng dẫn */
+    font-weight: 600;
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.guide-title .icon {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-toggle-guide {
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-toggle-guide:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+}
+
+.arrow-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform var(--transition-speed);
+}
+
+#teacher-guide.collapsed .arrow-icon {
+    transform: rotate(180deg);
+}
+
+.guide-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.guide-steps-carousel {
+    position: relative;
+    min-height: 70px;
+}
+
+.guide-step {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: translateY(10px);
+}
+
+.guide-step.active {
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.step-badge {
+    display: inline-block;
+    font-size: 0.85rem; /* Tăng chữ badge giai đoạn */
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--color-success);
+    background: rgba(46, 213, 115, 0.15);
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.step-text {
+    font-size: 1.15rem; /* Tăng chữ lời dẫn giáo viên */
+    line-height: 1.6;
+    color: var(--color-text);
+    font-style: italic;
+}
+
+.guide-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 12px;
+}
+
+#guide-indicator {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+.btn-icon-small {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--color-text);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon-small:hover:not(:disabled) {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-icon-small:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btn-icon-small svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Control Sidebar Panel (Floating Right Card on Desktop) */
+#controls-sidebar {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    bottom: 20px;
+    width: 360px;
+    height: calc(100vh - 40px);
+    background: var(--bg-sidebar);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    z-index: 20;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+}
+
+/* Floating Main Header at top center */
+.main-header {
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 15;
+    pointer-events: none; /* Cho phép thao tác chuột xuyên qua */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.main-header h1 {
+    font-size: 2.1rem; /* Tăng tiêu đề chính */
+    font-weight: 700;
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+    background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.main-header .subtitle {
+    font-size: 1.05rem; /* Tăng phụ đề */
+    color: var(--color-text-muted);
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+.main-header .brand-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: rgba(30, 144, 255, 0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.control-groups-container {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    overflow-y: auto; /* Chỉ cho phép cuộn nội dung nhóm điều khiển nếu chiều cao quá ngắn */
+}
+
+.control-group {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 10px; /* Thu nhỏ padding để bù cho font to */
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.group-title {
+    font-size: 0.85rem; /* Tăng cỡ chữ nhóm nút */
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--color-text-muted);
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+/* Button & Controls styling */
+.btn {
+    font-family: var(--font-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 12px; /* Rút bớt chiều cao nút */
+    font-size: 1.05rem; /* Tăng cỡ chữ trên nút */
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: 1px solid transparent;
+}
+
+.btn-large {
+    padding: 8px 16px; /* Rút bớt chiều cao nút lớn */
+    font-size: 1.15rem; /* Tăng cỡ chữ nút bóc tách */
+    border-radius: 10px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(30, 144, 255, 0.35);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 144, 255, 0.5);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--color-text);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-danger {
+    background: rgba(255, 71, 87, 0.1);
+    border: 1px solid rgba(255, 71, 87, 0.3);
+    color: var(--color-danger);
+}
+
+.btn-danger:hover {
+    background: var(--color-danger);
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.25);
+}
+
+.btn-toggle {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    color: var(--color-text-muted);
+}
+
+.btn-toggle:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-text);
+}
+
+.btn-toggle.active {
+    background: rgba(30, 144, 255, 0.1);
+    border-color: var(--color-primary);
+    color: #4eb5ff;
+}
+
+.icon {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.play-controls-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 10px;
+}
+
+/* Slider styling */
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.slider-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem; /* Tăng cỡ chữ slider */
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+#speed-value {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    outline: none;
+    transition: background 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(30, 144, 255, 0.8);
+    transition: transform 0.1s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* Toggle Grid */
+.toggle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* Stats panel */
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stat-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 5px 10px; /* Thu gọn padding một chút */
+    font-size: 0.95rem; /* Tăng kích cỡ chữ trong danh sách hạt */
+}
+
+.stat-type {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.red-dot { background-color: var(--color-proton); box-shadow: 0 0 6px var(--color-proton); }
+.grey-dot { background-color: var(--color-neutron); box-shadow: 0 0 6px var(--color-neutron); }
+.blue-dot { background-color: var(--color-electron); box-shadow: 0 0 6px var(--color-electron); }
+
+.stat-name {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.stat-count {
+    font-weight: 700;
+    color: var(--color-text);
+    font-size: 1.1rem; /* Tăng cỡ số lượng hạt */
+}
+
+.stat-count small {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+.stat-desc {
+    font-size: 0.95rem; /* Tăng ký hiệu (+), (-), (0) */
+    font-weight: 700;
+    width: 25px;
+    text-align: right;
+}
+
+.stats-summary {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Rút gọn gap */
+    margin-top: 2px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem; /* Tăng cỡ chữ bảng tổng kết điện tích */
+    color: var(--color-text-muted);
+}
+
+.summary-row.highlight {
+    font-size: 0.95rem; /* Tăng cỡ chữ trạng thái trung hòa */
+    font-weight: 600;
+}
+
+.summary-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 2px 0;
+}
+
+.charge-value {
+    font-weight: 700;
+}
+
+.text-red { color: var(--color-proton); }
+.text-blue { color: var(--color-electron); }
+.text-green { color: var(--color-success); }
+
+/* Sidebar Footer */
+.sidebar-footer {
+    padding: 10px 16px;
+    border-top: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 10px;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 1024px) {
+    #app-container {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #simulation-viewport {
+        position: relative;
+        height: 55%;
+        width: 100%;
+    }
+    
+    #controls-sidebar {
+        position: relative;
+        width: 100%;
+        height: 45%;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        border-radius: 0;
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+        box-shadow: none;
+    }
+    
+    .main-header {
+        top: 12px;
+        padding: 0 10px;
+    }
+
+    .main-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .main-header .subtitle {
+        font-size: 0.7rem;
+    }
+
+    .canvas-legend {
+        top: 75px;
+        left: 12px;
+        padding: 6px 10px;
+        gap: 6px;
+        border-radius: 8px;
+    }
+
+    .legend-item {
+        font-size: 0.75rem;
+        gap: 6px;
+    }
+
+    .legend-item .dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    #teacher-guide {
+        width: 90%;
+        bottom: 10px;
+    }
+}
+
+@media (max-width: 640px) {
+    .main-header {
+        top: 6px;
+    }
+    
+    .main-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .main-header .subtitle {
+        display: none; /* Ẩn bớt phụ đề trên điện thoại nhỏ để thoáng màn hình */
+    }
+
+    .canvas-legend {
+        display: none; /* Ẩn chú giải trên điện thoại nhỏ để tránh chật chội */
+    }
+}
