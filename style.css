@@ -152,6 +152,40 @@ body, html {
     pointer-events: auto;
 }
 
+/* Floating Fullscreen Button (Top-Right of Viewport) */
+.btn-floating {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 15;
+    background: rgba(10, 15, 26, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+    font-family: var(--font-main);
+}
+
+.btn-floating:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-floating:active {
+    transform: translateY(0);
+}
+
 .legend-item {
     display: flex;
     align-items: center;
@@ -737,6 +771,14 @@ input[type="range"]::-webkit-slider-thumb:hover {
         height: 8px;
     }
 
+    .btn-floating {
+        top: 75px;
+        right: 12px;
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        border-radius: 8px;
+    }
+
     #teacher-guide {
         width: 90%;
         bottom: 10px;
@@ -758,5 +800,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
     .canvas-legend {
         display: none; /* Ẩn chú giải trên điện thoại nhỏ để tránh chật chội */
+    }
+
+    .btn-floating span {
+        display: none; /* Chỉ hiển thị icon trên điện thoại nhỏ để tiết kiệm diện tích */
+    }
+    
+    .btn-floating {
+        top: 6px;
+        right: 6px;
+        padding: 6px;
+        border-radius: 50%;
     }
 }

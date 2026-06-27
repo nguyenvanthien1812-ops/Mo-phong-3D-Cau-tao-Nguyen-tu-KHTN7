@@ -466,6 +466,13 @@ function setupEventListeners() {
     
     // 9. Nút Làm lại (Reset)
     dom.btnReset.addEventListener('click', resetSimulation);
+    
+    // 10. Nút Toàn màn hình
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    if (btnFullscreen) {
+        btnFullscreen.addEventListener('click', toggleFullscreen);
+        document.addEventListener('fullscreenchange', onFullscreenChange);
+    }
 }
 
 // --- CÁC HÀM XỬ LÝ SỰ KIỆN CHI TIẾT ---
@@ -680,6 +687,33 @@ function resetSimulation() {
     });
     
     time = 0;
+}
+
+// --- XỬ LÝ TOÀN MÀN HÌNH (FULLSCREEN) ---
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.error(`Error enabling full-screen: ${err.message}`);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+function onFullscreenChange() {
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    if (!btnFullscreen) return;
+    
+    const icon = btnFullscreen.querySelector('svg');
+    const spanText = btnFullscreen.querySelector('span');
+    
+    if (document.fullscreenElement) {
+        spanText.innerText = 'Thu nhỏ';
+        icon.innerHTML = '<path d="M4 14h6v6m10-6h-6v6M4 10h6V4m10 6h-6V4" />';
+    } else {
+        spanText.innerText = 'Toàn màn hình';
+        icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />';
+    }
 }
 
 // Khởi chạy ứng dụng khi DOM tải xong
