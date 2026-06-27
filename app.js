@@ -295,7 +295,6 @@ function createOrbitLine(radius) {
 // --- TẠO VÀ CẬP NHẬT NHÃN CHÚ THÍCH (LABELS OVERLAY) ---
 function createLabels() {
     const labelsData = [
-        { id: 'nucleus', text: 'Hạt nhân (gồm 6 proton, 6 neutron)', className: 'badge-nucleus' },
         { id: 'orbit1', text: 'Lớp electron trong cùng (2 electron)', className: 'badge-orbit-1' },
         { id: 'orbit2', text: 'Lớp electron ngoài cùng (4 electron)', className: 'badge-orbit-2' }
     ];
