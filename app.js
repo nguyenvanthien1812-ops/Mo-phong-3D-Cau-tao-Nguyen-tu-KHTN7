@@ -12,7 +12,6 @@ const state = {
     showLabels: true,
     autoRotate: false,
     explodeFactor: 0.0, // 0.0: bình thường, 1.0: bóc tách hoàn toàn
-    currentGuideStep: 0,
 };
 
 // --- CÁC THÔNG SỐ KỸ THUẬT ---
@@ -37,22 +36,13 @@ const dom = {
     btnAutoRotate: document.getElementById('btn-auto-rotate'),
     btnToggleOrbits: document.getElementById('btn-toggle-orbits'),
     btnToggleLabels: document.getElementById('btn-toggle-labels'),
-    btnToggleGuidePanel: document.getElementById('btn-toggle-guide-panel'),
     btnReset: document.getElementById('btn-reset'),
     
     // Slider
     sliderSpeed: document.getElementById('slider-speed'),
     speedValue: document.getElementById('speed-value'),
     
-    // Lời dẫn & Gợi ý
-    teacherGuide: document.getElementById('teacher-guide'),
-    btnToggleGuide: document.getElementById('btn-toggle-guide'),
-    toggleGuideHeader: document.getElementById('toggle-guide-header'),
-    btnPrevGuide: document.getElementById('prev-guide'),
-    btnNextGuide: document.getElementById('next-guide'),
-    guideIndicator: document.getElementById('guide-indicator'),
-    guideSteps: document.querySelectorAll('.guide-step'),
-    toggleGuideBtnText: document.getElementById('toggle-guide-btn-text'),
+    toggleGuideBtnText: null, // Removed
 };
 
 // --- KHỞI TẠO THREE.JS ---
@@ -108,7 +98,7 @@ function init() {
     controls.dampingFactor = 0.05;
     controls.minDistance = 3;
     controls.maxDistance = 30;
-    controls.target.set(0, 0, 0);
+    controls.target.set(0, 0.8, 0);
     
     // 3. Hệ thống Ánh sáng Studio
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
@@ -457,11 +447,7 @@ function setupEventListeners() {
         dom.speedValue.innerText = state.speedMultiplier.toFixed(1) + 'x';
     });
     
-    // 8. Bảng gợi ý Lời dẫn Giáo viên
-    dom.toggleGuideHeader.addEventListener('click', toggleGuidePanel);
-    dom.btnToggleGuidePanel.addEventListener('click', toggleGuidePanel);
-    dom.btnPrevGuide.addEventListener('click', () => navigateGuide(-1));
-    dom.btnNextGuide.addEventListener('click', () => navigateGuide(1));
+
     
     // 9. Nút Làm lại (Reset)
     dom.btnReset.addEventListener('click', resetSimulation);
@@ -501,9 +487,7 @@ function toggleExplode() {
             <span>Gộp nguyên tử</span>
         `;
         
-        // Tự động điều hướng Lời dẫn Sư phạm đến bước Bóc tách
-        setGuideStep(2); // Bước 3 (index 2) trong danh sách
-        openGuidePanel();
+
     } else {
         dom.btnExplode.classList.add('btn-primary');
         dom.btnExplode.classList.remove('btn-secondary');
@@ -574,52 +558,7 @@ function toggleLabels() {
     }
 }
 
-// Bảng gợi ý Sư phạm
-function toggleGuidePanel() {
-    const isCollapsed = dom.teacherGuide.classList.contains('collapsed');
-    
-    if (isCollapsed) {
-        openGuidePanel();
-    } else {
-        closeGuidePanel();
-    }
-}
 
-function openGuidePanel() {
-    dom.teacherGuide.classList.remove('collapsed');
-    dom.btnToggleGuidePanel.classList.add('active');
-    dom.toggleGuideBtnText.innerText = 'Ẩn lời dẫn';
-}
-
-function closeGuidePanel() {
-    dom.teacherGuide.classList.add('collapsed');
-    dom.btnToggleGuidePanel.classList.remove('active');
-    dom.toggleGuideBtnText.innerText = 'Hiện lời dẫn';
-}
-
-function setGuideStep(stepIndex) {
-    state.currentGuideStep = stepIndex;
-    
-    dom.guideSteps.forEach((step, idx) => {
-        if (idx === stepIndex) {
-            step.classList.add('active');
-        } else {
-            step.classList.remove('active');
-        }
-    });
-    
-    dom.guideIndicator.innerText = `${stepIndex + 1} / ${dom.guideSteps.length}`;
-    
-    dom.btnPrevGuide.disabled = (stepIndex === 0);
-    dom.btnNextGuide.disabled = (stepIndex === dom.guideSteps.length - 1);
-}
-
-function navigateGuide(direction) {
-    let nextStep = state.currentGuideStep + direction;
-    if (nextStep >= 0 && nextStep < dom.guideSteps.length) {
-        setGuideStep(nextStep);
-    }
-}
 
 // Khôi phục mọi cài đặt về mặc định
 function resetSimulation() {
@@ -663,12 +602,10 @@ function resetSimulation() {
     
     // Reset camera & controls
     camera.position.set(0, 6, 16);
-    controls.target.set(0, 0, 0);
+    controls.target.set(0, 0.8, 0);
     controls.update();
     
-    // Reset guide steps
-    setGuideStep(0);
-    closeGuidePanel();
+
     
     // Reset groups
     orbitGroup1.scale.setScalar(1.0);

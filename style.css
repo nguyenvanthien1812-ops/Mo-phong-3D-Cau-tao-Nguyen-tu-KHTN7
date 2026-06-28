@@ -34,7 +34,8 @@ body, html {
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden !important; /* Triệt tiêu hoàn toàn thanh cuộn trình duyệt */
+    overflow-x: hidden;
+    overflow-y: auto; /* Cho phép cuộn trang để thấy footer ở dưới cùng */
     background-color: var(--bg-dark);
     color: var(--color-text);
     font-family: var(--font-main);
@@ -134,11 +135,12 @@ body, html {
     color: #ffffff;
 }
 
-/* Floating Canvas Legend (Top-Left) */
+/* Floating Canvas Legend (Bottom-Left) */
 .canvas-legend {
     position: absolute;
-    top: 24px;
+    bottom: 24px; /* Đặt ở góc dưới bên trái */
     left: 24px;
+    top: auto; /* Reset top */
     background: rgba(10, 15, 26, 0.85);
     backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
@@ -152,38 +154,40 @@ body, html {
     pointer-events: auto;
 }
 
-/* Floating Fullscreen Button (Top-Right of Viewport) */
-.btn-floating {
-    position: absolute;
-    top: 24px;
-    right: 24px;
-    z-index: 15;
-    background: rgba(10, 15, 26, 0.85);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 10px 14px;
+/* Sidebar Fullscreen Button */
+.group-title-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: var(--color-text);
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.btn-fullscreen-sidebar {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--color-text-muted);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
     font-weight: 600;
-    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     cursor: pointer;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     transition: all 0.2s ease;
     font-family: var(--font-main);
 }
 
-.btn-floating:hover {
+.btn-fullscreen-sidebar:hover {
     background: var(--color-primary);
     border-color: var(--color-primary);
     color: white;
-    transform: translateY(-2px);
 }
 
-.btn-floating:active {
-    transform: translateY(0);
+.btn-fullscreen-sidebar svg {
+    width: 12px;
+    height: 12px;
 }
 
 .legend-item {
@@ -195,173 +199,7 @@ body, html {
     color: var(--color-text);
 }
 
-/* Teacher Guide Panel (Bottom Slide-up) */
-#teacher-guide {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 85%;
-    max-width: 800px;
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    z-index: 20;
-    transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-}
 
-#teacher-guide.collapsed {
-    transform: translate(-50%, calc(100% - 50px));
-}
-
-.guide-header {
-    height: 50px;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(30, 41, 59, 0.4);
-    border-bottom: 1px solid var(--border-color);
-    cursor: pointer;
-}
-
-.guide-title {
-    font-size: 1.1rem; /* Tăng kích thước tiêu đề hướng dẫn */
-    font-weight: 600;
-    color: var(--color-primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.guide-title .icon {
-    width: 18px;
-    height: 18px;
-}
-
-.btn-toggle-guide {
-    background: none;
-    border: none;
-    color: var(--color-text-muted);
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-}
-
-.btn-toggle-guide:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--color-text);
-}
-
-.arrow-icon {
-    width: 20px;
-    height: 20px;
-    transition: transform var(--transition-speed);
-}
-
-#teacher-guide.collapsed .arrow-icon {
-    transform: rotate(180deg);
-}
-
-.guide-content {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.guide-steps-carousel {
-    position: relative;
-    min-height: 70px;
-}
-
-.guide-step {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    transform: translateY(10px);
-}
-
-.guide-step.active {
-    position: relative;
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-.step-badge {
-    display: inline-block;
-    font-size: 0.85rem; /* Tăng chữ badge giai đoạn */
-    text-transform: uppercase;
-    font-weight: 700;
-    color: var(--color-success);
-    background: rgba(46, 213, 115, 0.15);
-    padding: 3px 10px;
-    border-radius: 4px;
-    margin-bottom: 8px;
-}
-
-.step-text {
-    font-size: 1.15rem; /* Tăng chữ lời dẫn giáo viên */
-    line-height: 1.6;
-    color: var(--color-text);
-    font-style: italic;
-}
-
-.guide-navigation {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    padding-top: 12px;
-}
-
-#guide-indicator {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    font-weight: 600;
-}
-
-.btn-icon-small {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color);
-    color: var(--color-text);
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-icon-small:hover:not(:disabled) {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-}
-
-.btn-icon-small:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-.btn-icon-small svg {
-    width: 14px;
-    height: 14px;
-}
 
 /* Control Sidebar Panel (Floating Right Card on Desktop) */
 #controls-sidebar {
@@ -393,16 +231,41 @@ body, html {
     pointer-events: none; /* Cho phép thao tác chuột xuyên qua */
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: center; /* Căn giữa */
     gap: 4px;
-    width: 100%;
-    max-width: 600px;
+    width: 95%;
+    max-width: 800px;
 }
 
-.main-header h1 {
-    font-size: 2.1rem; /* Tăng tiêu đề chính */
+.app-brand-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    pointer-events: auto;
+}
+
+.brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap; /* Đảm bảo logo và tên luôn nằm trên 1 hàng */
+}
+
+.app-logo {
+    height: 2.15rem;
+    width: auto;
+    display: block;
+}
+
+.app-name {
+    font-size: 2.1rem;
     font-weight: 700;
-    margin-bottom: 4px;
+    margin: 0;
     letter-spacing: -0.5px;
     color: #ffffff;
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
@@ -411,10 +274,94 @@ body, html {
     -webkit-text-fill-color: transparent;
 }
 
+.header-sub-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.45);
+    margin-top: 2px;
+    pointer-events: auto; /* Cho phép tương tác click link nếu có */
+}
+
+.brand-badge-small {
+    font-weight: 700;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sub-row-divider {
+    color: rgba(255, 255, 255, 0.15);
+}
+
+.sub-row-owner {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.4);
+}
+
 .main-header .subtitle {
     font-size: 1.05rem; /* Tăng phụ đề */
     color: var(--color-text-muted);
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* App Footer (không che nội dung, chỉ nhìn thấy khi cuộn xuống dưới cùng) */
+.app-footer {
+    background: rgba(10, 15, 26, 0.95);
+    border-top: 1px solid var(--border-color);
+    padding: 24px 20px;
+    color: var(--color-text-muted);
+    font-family: var(--font-main);
+    z-index: 20;
+    position: relative;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.footer-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+}
+
+.footer-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+}
+
+.footer-brand-link {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.footer-brand-link:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px var(--color-primary);
+}
+
+.footer-info {
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.footer-disclaimer {
+    font-size: 0.8rem;
+    font-style: italic;
+    max-width: 700px;
+    color: rgba(255, 255, 255, 0.35);
+    line-height: 1.6;
+    margin: 0;
 }
 
 .main-header .brand-badge {
@@ -709,9 +656,11 @@ input[type="range"]::-webkit-slider-thumb:hover {
     padding: 10px 16px;
     border-top: 1px solid var(--border-color);
     background: rgba(0, 0, 0, 0.1);
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 10px;
+    display: flex;
+}
+
+.sidebar-footer .btn {
+    width: 100%;
 }
 
 /* Media Queries for Responsive Design */
@@ -745,16 +694,24 @@ input[type="range"]::-webkit-slider-thumb:hover {
         padding: 0 10px;
     }
 
-    .main-header h1 {
-        font-size: 1.25rem;
+    .app-name {
+        font-size: 1.3rem !important;
+    }
+
+    .app-logo {
+        height: 1.35rem !important;
+    }
+
+    .header-sub-row {
+        font-size: 0.7rem;
+        gap: 6px;
     }
 
     .main-header .subtitle {
         font-size: 0.7rem;
     }
-
     .canvas-legend {
-        top: 75px;
+        top: 85px; /* Điều chỉnh để nằm dưới header di động */
         left: 12px;
         padding: 6px 10px;
         gap: 6px;
@@ -771,18 +728,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
         height: 8px;
     }
 
-    .btn-floating {
-        top: 75px;
-        right: 12px;
-        padding: 6px 10px;
-        font-size: 0.75rem;
-        border-radius: 8px;
-    }
 
-    #teacher-guide {
-        width: 90%;
-        bottom: 10px;
-    }
 }
 
 @media (max-width: 640px) {
@@ -790,8 +736,16 @@ input[type="range"]::-webkit-slider-thumb:hover {
         top: 6px;
     }
     
-    .main-header h1 {
-        font-size: 1.1rem;
+    .app-name {
+        font-size: 1.1rem !important;
+    }
+
+    .app-logo {
+        height: 1.15rem !important;
+    }
+
+    .header-sub-row {
+        display: none;
     }
     
     .main-header .subtitle {
@@ -802,14 +756,12 @@ input[type="range"]::-webkit-slider-thumb:hover {
         display: none; /* Ẩn chú giải trên điện thoại nhỏ để tránh chật chội */
     }
 
-    .btn-floating span {
-        display: none; /* Chỉ hiển thị icon trên điện thoại nhỏ để tiết kiệm diện tích */
+    .btn-fullscreen-sidebar span {
+        display: none; /* Ẩn chữ trên mobile nhỏ */
     }
     
-    .btn-floating {
-        top: 6px;
-        right: 6px;
-        padding: 6px;
+    .btn-fullscreen-sidebar {
+        padding: 4px;
         border-radius: 50%;
     }
 }

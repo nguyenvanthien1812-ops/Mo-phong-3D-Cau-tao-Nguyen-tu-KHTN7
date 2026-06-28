@@ -20,8 +20,15 @@
         <main id="simulation-viewport">
             <!-- Immersive Floating Header -->
             <header class="main-header">
-                <span class="brand-badge">KHTN 7 - Bài 2</span>
-                <h1>Cấu tạo Nguyên tử</h1>
+                <div class="app-brand-bar">
+                    <a href="https://giaoviendoimoi.com/" target="_blank" class="brand-link">
+                        <img src="logo.png" alt="Logo" class="app-logo">
+                        <h1 class="app-name">Cấu tạo Nguyên tử Carbon</h1>
+                    </a>
+                </div>
+                <div class="header-sub-row">
+                    <span class="brand-badge-small">KHTN 7 - Bài 2</span>
+                </div>
                 <p class="subtitle">Mô hình Carbon (<sub>6</sub>C) chuẩn Rutherford - Bohr</p>
             </header>
 
@@ -41,64 +48,14 @@
                 </div>
             </div>
 
-            <!-- Floating Fullscreen Button (Top-Right of Viewport) -->
-            <button id="btn-fullscreen" class="btn-floating" title="Toàn màn hình">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-                </svg>
-                <span>Toàn màn hình</span>
-            </button>
+
 
             <div id="canvas3d"></div>
             
             <!-- 2D Annotations overlay layer (tracked in JS) -->
             <div id="labels-overlay"></div>
             
-            <!-- Floating Teacher Guide Panel (Bottom Overlay) -->
-            <div id="teacher-guide" class="collapsed">
-                <div class="guide-header" id="toggle-guide-header">
-                    <span class="guide-title">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                        Lời dẫn và Gợi ý Sư phạm (Giáo viên)
-                    </span>
-                    <button class="btn-toggle-guide" id="btn-toggle-guide" title="Ẩn/Hiện lời dẫn">
-                        <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="18 15 12 9 6 15"></polyline>
-                        </svg>
-                    </button>
-                </div>
-                <div class="guide-content">
-                    <div class="guide-steps-carousel">
-                        <div class="guide-step active" data-step="1">
-                            <span class="step-badge">Giai đoạn 1: Quan sát tổng thể</span>
-                            <p class="step-text">"Các em hãy quan sát mô hình 3D trên bảng, theo các em, hạt nhân đang nằm ở vị trí nào của nguyên tử? Lớp vỏ có cấu tạo như thế nào?"</p>
-                        </div>
-                        <div class="guide-step" data-step="2">
-                            <span class="step-badge">Giai đoạn 2: Quan sát chuyển động</span>
-                            <p class="step-text">"Khi thầy/cô tăng tốc độ lên, các em thấy các electron đang di chuyển như thế nào xung quanh hạt nhân? Chúng di chuyển tự do hay có quỹ đạo xác định?"</p>
-                        </div>
-                        <div class="guide-step" data-step="3">
-                            <span class="step-badge">Giai đoạn 3: Khám phá hạt nhân (Bóc tách)</span>
-                            <p class="step-text">"Bây giờ, thầy/cô sẽ bóc tách lớp vỏ electron ra. Các em hãy quan sát kỹ bên trong lõi hạt nhân có mấy loại hạt, và chúng có màu sắc như thế nào?"</p>
-                        </div>
-                        <div class="guide-step" data-step="4">
-                            <span class="step-badge">Giai đoạn 4: Chốt kiến thức tổng hợp</span>
-                            <p class="step-text">"Từ những quan sát trực quan vừa rồi, bạn nào có thể chốt lại cho lớp biết cấu tạo nguyên tử gồm những phần nào và các loại hạt tương ứng?"</p>
-                        </div>
-                    </div>
-                    <div class="guide-navigation">
-                        <button id="prev-guide" class="btn-icon-small" disabled>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        </button>
-                        <span id="guide-indicator">1 / 4</span>
-                        <button id="next-guide" class="btn-icon-small">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
+
         </main>
 
         <!-- Floating Controls Card on the right -->
@@ -106,7 +63,15 @@
             <div class="control-groups-container">
                 <!-- Group 1: Mô phỏng & Tương tác (Combined Bóc tách & Chuyển động) -->
                 <section class="control-group">
-                    <h2 class="group-title">Điều khiển mô phỏng</h2>
+                    <div class="group-title-row">
+                        <h2 class="group-title">Điều khiển mô phỏng</h2>
+                        <button id="btn-fullscreen" class="btn-fullscreen-sidebar" title="Toàn màn hình">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+                            </svg>
+                            <span>Toàn màn hình</span>
+                        </button>
+                    </div>
                     <button id="btn-explode" class="btn btn-primary btn-large">
                         <svg class="icon btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -219,24 +184,31 @@
                 </section>
             </div>
 
-            <!-- Sidebar Footer: Reset & Guide Toggle -->
+            <!-- Sidebar Footer: Reset -->
             <footer class="sidebar-footer">
-                <button id="btn-toggle-guide-panel" class="btn btn-secondary active">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                    <span id="toggle-guide-btn-text">Ẩn lời dẫn</span>
-                </button>
                 <button id="btn-reset" class="btn btn-danger">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                         <polyline points="3 3 3 8 8 8" />
                     </svg>
-                    <span>Làm lại</span>
+                    <span>Làm lại mô phỏng</span>
                 </button>
             </footer>
         </aside>
     </div>
+
+    <!-- Footer (không che nội dung, chỉ nhìn thấy khi cuộn xuống dưới cùng) -->
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <span class="footer-info">Tác giả: Nguyễn Thiện</span>
+                <span class="footer-info">SĐT: 0988250112</span>
+            </div>
+            <p class="footer-disclaimer">
+                "Hệ thống mô phỏng bài học này là dự án học liệu số độc lập, được biên soạn nhằm mục đích hỗ trợ học sinh trực quan hóa kiến thức. Chúng tôi không có mối quan hệ thương mại và không đại diện cho bất kỳ Nhà xuất bản nào."
+            </p>
+        </div>
+    </footer>
 
     <!-- Main JavaScript App -->
     <script src="app.js"></script>
